@@ -14,17 +14,17 @@ int main()
     unsigned char couleurCarre[2];
     int xmin, ymin, xmax, ymax;
 
-    image pic;
+    Image pic;
     Quadtree quadtree;
 
-    pic = FAIRE_image();
+    pic = initImage();
 
 /*
     printf("Rentrer l'image a etudier..\n");
     scanf("%s", fichier);
 */
 
-    image_charger(pic, "fille.ppm");
+    pic=chargerImage("misc/fille.ppm");
     //canal = fopen(fichier, "r");
 
     //couleur = malloc(3*sizeof(unsigned char));
@@ -37,7 +37,7 @@ int main()
     image_write_pixel(pic, 1, 1, couleurCarre);
  
  //RECTANGLE
-    /*
+    
     printf("\n\nTracage du carre: \n");
     printf("xmin: ");
     scanf("%d", &xmin);
@@ -52,16 +52,7 @@ int main()
     couleurCarre[1] = 255;
     couleurCarre[2] = 0;
     draw_square(pic, xmin, ymin, xmax, ymax, couleurCarre);
-    */
 
-    quadtree = create_quadtree();
-    printf("Creation quadtree: ok \n");
-
-    quadtree_subdivide(quadtree);
-    printf("Subdivision quadtree: OK \n");
-
-    delete_quadtree(quadtree);
-    printf("Quadtree delete: OK\n");
-    DEFAIRE_image(pic);
+    detruireImage(pic);
     return 0;
 }

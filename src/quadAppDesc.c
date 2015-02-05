@@ -13,6 +13,7 @@
 * @param Seuil(double) Seuil pour arrêter la division
 * @return Quadtree
 */
+/*
 extern Quadtree split_image(Image pic, double seuil)
 {
     Quadtree quadtree = create_quadtree();
@@ -31,8 +32,8 @@ extern Quadtree split_image(Image pic, double seuil)
 
 
 
-//    for (i = 0; i < 4; i++)
- //   {
+	for (i = 0; i < 4; i++)
+  {
         
         give_moments(image, xmin, ymin, xmax, ymax, M0, M1, M2);
 
@@ -76,3 +77,4 @@ extern void draw_quadtree(Image pic, Quadtree quadtree, unsigned char* couleur)
 
 
 }
+*/

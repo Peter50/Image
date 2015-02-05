@@ -6,6 +6,32 @@
 #include "image.h"
 #include "image_util.h"
 
+struct sOrdre{
+
+	double M0,
+	double * M1,
+	double * M2,
+
+};
+
+Ordre initOrdre(void){
+
+	Ordre ordre=malloc(sizeof(struct sOrdre));
+
+	ordre->M0=0;
+	ordre->M1=calloc(3,sizeof(double));
+	ordre->M2=calloc(3,sizeof(double));
+
+	return ordre;
+}
+
+void detruireOrdre(Ordre ordre){
+
+	free(ordre->M2);
+	free(ordre->M1);
+	free(ordre);
+}
+
 /**
 * Lecture d'une image
 * @param Image(Image) à analyser
@@ -14,26 +40,14 @@
 * @param Couleur(unsigned char*) du pixel à lire
 */
 
-extern void image_read_pixel(image pic, int ligne, int colonne, unsigned char* couleur)
+extern void image_read_pixel(Image pic, int ligne, int colonne, unsigned char* couleur)
 {
-    int i;
-    int dim = image_give_dim(pic);
 
-    Point p;
+	Pixel pixel=getPixelImage(pic,ligne,colonne);
 
-    COORDX(p) = ligne;
-    COORDY(p) = colonne;
-
-
-    image_move_to(pic, &p);
-
-
-    couleur = (unsigned char*)image_lire_pixel(pic);
-
-    for (i = 0; i < dim; i++)
-    {
-        printf("%hhu-", couleur[i]);
-    }
+	couleur[0]=getValeurPixel(pixel,0);
+	couleur[1]=getValeurPixel(pixel,1);
+	couleur[2]=getValeurPixel(pixel,2);
 }
 
 /**
@@ -44,19 +58,12 @@ extern void image_read_pixel(image pic, int ligne, int colonne, unsigned char* c
 * @param Couleur(unsigned char*) du pixel
 */
 
-extern void image_write_pixel(image pic, int ligne , int colonne, unsigned char* couleur)
+extern void image_write_pixel(Image pic, int ligne , int colonne, unsigned char* couleur)
 {
     int i;
 
-    Point p;
-
-    COORDX(p) = ligne;
-    COORDY(p) = colonne;
-
-    image_move_to(pic, &p);
-
-    image_ecrire_pixel(pic, (int*)couleur);
-    image_sauvegarder(pic, "fillesChangée.ppm");
+    Pixel pixel=getPixelImage(pic,ligne,colonne);
+	setValeurPixel(pixel,couleur);
 }
 
 /**
@@ -71,40 +78,21 @@ extern void image_write_pixel(image pic, int ligne , int colonne, unsigned char*
 */
 
 
-extern void draw_square(image pic, int xmin, int ymin, int xmax, int ymax, unsigned char* couleur) //x=ligne; y=colonne
+extern void draw_square(Image pic, int xmin, int ymin, int xmax, int ymax, unsigned char* couleur) //x=ligne; y=colonne
 {
+	int i;
 
-    int i,j;
-    int distAbs = xmax - xmin;
-    int distOrd = ymax - ymin;
-    /*
-    * Remplissage des bords sur les largeurs du carré
-    */
+	for(i=xmin;i<=xmax;i++){
+		image_write_pixel(pic,ymin,i,couleur);	
+		image_write_pixel(pic,ymax,i,couleur);
+	}
+	for(i=ymin;i<=ymax;i++){
+		image_write_pixel(pic,i,xmin,couleur);
+		image_write_pixel(pic,i,xmax,couleur);
+	}
 
-    Point p;
+	sauverImage(pic,"misc/imageModifie.ppm",INCONUE,INCOLORE);
 
-
-    for (i = 0; i < distAbs; i++)
-    {
-        //Ligne du haut
-        COORDX(p) = xmin + i;
-        COORDY(p) = ymin;
-        image_write_pixel(pic, COORDX(p), COORDY(p), couleur);
-        COORDY(p) = ymax;
-        //Ligne du bas
-        image_write_pixel(pic, COORDX(p), COORDY(p), couleur);
-    }
-
-    for (i = 0; i < distOrd+1; i++)
-    {
-        //Ligne du haut
-        COORDX(p) = xmin;
-        COORDY(p) = ymin + i;
-        image_write_pixel(pic, COORDX(p), COORDY(p), couleur);
-        COORDX(p) = xmax;
-        //Ligne du bas
-        image_write_pixel(pic, COORDX(p), COORDY(p), couleur);
-    }
 }
 
 
@@ -120,7 +108,7 @@ extern void draw_square(image pic, int xmin, int ymin, int xmax, int ymax, unsig
 * @param ordre2(double*)
 */
 
-extern void give_moments(image pic, int xmin, int ymin, int xmax, int ymax, int* ordre0, double* ordre1, double* ordre2)
+extern Ordre give_moments(image pic, int xmin, int ymin, int xmax, int ymax, int* ordre0, double* ordre1, double* ordre2)
 {
     int i,j;
     int distAbs = xmin - xmax;
@@ -182,5 +170,4 @@ extern void give_moments(image pic, int xmin, int ymin, int xmax, int ymax, int*
         COORDX(p)++;
     }
 }
-
 

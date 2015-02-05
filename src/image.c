@@ -68,6 +68,8 @@ struct sImage{
 	int hauteur;
 	int valMax;
 	Pixel ** pixel;
+	Codage codage;
+	Couleur couleur;
 };
 
 Image initImage(void){
@@ -78,6 +80,8 @@ Image initImage(void){
 	image->hauteur=0;
 	image->valMax=0;
 	image->pixel=NULL;
+	image->codage=INCONUE;
+	image->couleur=INCOLORE;
 
 	return image;
 }
@@ -154,19 +158,28 @@ Image chargerImage(char * fichier){
 			type=tmp-'0';
 			if(type == 6 || type == 3){
 				couleur=COULEUR;
+				image->couleur=COULEUR;
 			}
 			else if(type == 5 || type == 2){
 				couleur=NOIR;
+				image->couleur=NOIR;
 			}
 			else if(type == 4 || type == 1){
 				couleur=BIN;
+				image->couleur=BIN;
+			}
+			if(type == 6 || type == 5 || type == 4){
+				image->codage=BINAIRE;
+			}
+			else if(type == 1 || type == 2 || type == 3) {
+				image->codage=DECIMAL;
 			}
 			state++;
 		}
 		else if(state == 1 && tmp>= '0' && tmp<='9'){
 			fseek(file, -1, SEEK_CUR);
 			fscanf(file,"%d %d",&largeur,&hauteur);
-			initPixelImage(image,largeur,hauteur,couleur);			
+			initPixelImage(image,largeur,hauteur,couleur);		
 			state++;
 		}
 		else if(state == 2 && tmp>='0' && tmp <='9'){
@@ -246,6 +259,13 @@ Image chargerImage(char * fichier){
 
 void sauverImage(Image image, char * fichier,Codage codage, Couleur couleur){
 
+	if(codage == INCONUE){
+		codage=image->codage;
+	}
+	if(couleur == INCOLORE){
+		couleur=image->couleur;
+	}
+
 	FILE * file=NULL;
 	file = fopen(fichier,"w");
 
@@ -295,4 +315,8 @@ void sauverImage(Image image, char * fichier,Codage codage, Couleur couleur){
 
 	fclose(file);
 
+}
+
+Pixel getPixelImage(Image image, int i, int j){
+	return image->pixel[i][j];
 }

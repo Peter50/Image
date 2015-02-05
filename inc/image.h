@@ -6,6 +6,7 @@ typedef enum{
 	NOIR=0,
 	COULEUR=1,
 	BIN=2,
+	INCOLORE=3,
 
 }Couleur;
 
@@ -13,6 +14,7 @@ typedef enum{
 
 	BINAIRE=0,
 	DECIMAL=1,
+	INCONUE=2,
 
 }Codage;
 
@@ -37,5 +39,7 @@ void infoImage(Image image);
 Image chargerImage(char * fichier);
 
 void sauverImage(Image image, char * fichier, Codage codage, Couleur couleur);
+
+Pixel getPixelImage(Image image, int i, int j);
 
 #endif
