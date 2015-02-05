@@ -1,0 +1,186 @@
+/**
+* @file image_util.c
+* @author CHEN Denis - 1A Info ENSICaen
+*/
+
+#include "../include/image.h"
+#include "../include/image_util.h"
+
+/**
+* Lecture d'une image
+* @param Image(Image) à analyser
+* @param Ligne(int) du pixel à lire
+* @param Colonne(int) du pixel à lire
+* @param Couleur(unsigned char*) du pixel à lire
+*/
+
+extern void image_read_pixel(image pic, int ligne, int colonne, unsigned char* couleur)
+{
+    int i;
+    int dim = image_give_dim(pic);
+
+    Point p;
+
+    COORDX(p) = ligne;
+    COORDY(p) = colonne;
+
+
+    image_move_to(pic, &p);
+
+
+    couleur = (unsigned char*)image_lire_pixel(pic);
+
+    for (i = 0; i < dim; i++)
+    {
+        printf("%hhu-", couleur[i]);
+    }
+}
+
+/**
+* Ecriture d'un pixel dans une image
+* @param Image(Image) où écrire le pixel
+* @param Ligne(int): Abscisse du pixel à remplir
+* @param Colonne(int): Ordonnée du pixel à remplir
+* @param Couleur(unsigned char*) du pixel
+*/
+
+extern void image_write_pixel(image pic, int ligne , int colonne, unsigned char* couleur)
+{
+    int i;
+
+    Point p;
+
+    COORDX(p) = ligne;
+    COORDY(p) = colonne;
+
+    image_move_to(pic, &p);
+
+    image_ecrire_pixel(pic, (int*)couleur);
+    image_sauvegarder(pic, "fillesChangée.ppm");
+}
+
+/**
+* La fonction permet de dessiner les bordures d'un carré dans l'image selectionnée
+* @brief Fonction dessinant un carré
+* @param Image(Image) dans laquelle on veut dessiner le carré
+* @param xmin(int) Abscisse Haut Gauche du carré
+* @param ymin(int) Abscisse Haut Droite du carré
+* @param xmax(int) Abscisse bas droite du carré
+* @param ymax(int) Ordonnée bas droite du carré
+* @param Couleur(unsigned char*) des bordures du carré
+*/
+
+
+extern void draw_square(image pic, int xmin, int ymin, int xmax, int ymax, unsigned char* couleur) //x=ligne; y=colonne
+{
+
+    int i,j;
+    int distAbs = xmax - xmin;
+    int distOrd = ymax - ymin;
+    /*
+    * Remplissage des bords sur les largeurs du carré
+    */
+
+    Point p;
+
+
+    for (i = 0; i < distAbs; i++)
+    {
+        //Ligne du haut
+        COORDX(p) = xmin + i;
+        COORDY(p) = ymin;
+        image_write_pixel(pic, COORDX(p), COORDY(p), couleur);
+        COORDY(p) = ymax;
+        //Ligne du bas
+        image_write_pixel(pic, COORDX(p), COORDY(p), couleur);
+    }
+
+    for (i = 0; i < distOrd+1; i++)
+    {
+        //Ligne du haut
+        COORDX(p) = xmin;
+        COORDY(p) = ymin + i;
+        image_write_pixel(pic, COORDX(p), COORDY(p), couleur);
+        COORDX(p) = xmax;
+        //Ligne du bas
+        image_write_pixel(pic, COORDX(p), COORDY(p), couleur);
+    }
+}
+
+
+/**
+* Fonction qui calcul les moments d'une image
+* @param Image(Image) à analyser
+* @param xmin(int) Abscisse Haut Gauche de la section à analyser
+* @param ymin(int) Abscisse Haut Droite de la section à analyser
+* @param xmax(int) Abscisse bas droite de la section à analyser
+* @param ymax(int) Ordonnée bas droite de la section à analyser
+* @param ordre0(int*) :
+* @param ordre1(double*)
+* @param ordre2(double*)
+*/
+
+extern void give_moments(image pic, int xmin, int ymin, int xmax, int ymax, int* ordre0, double* ordre1, double* ordre2)
+{
+    int i,j;
+    int distAbs = xmin - xmax;
+    int distOrd = ymax - ymin;
+    unsigned char tab[2];
+    int dim = image_give_dim(pic);
+
+    Point p;
+
+    COORDX(p) = xmin;
+    COORDY(p) = ymin;
+
+
+    ordre0[0] = (xmin-xmax)*(ymax-ymin);
+
+    for (i = 0; i < distAbs; i++)
+    {
+        for (j = 0; j < distOrd ; j++)
+        {
+            image_move_to(pic, &p);
+            image_read_pixel(pic, COORDX(p), COORDY(p), tab);
+            if (dim == 3)
+            {
+                ordre1[0] = ordre1[0] + tab[0];
+                ordre1[1] = ordre1[1] + tab[1];
+                ordre1[2] = ordre1[2] + tab[2];
+            }
+
+            else
+            {
+                ordre1[0] = ordre1[0] + tab[0];
+            }
+            COORDY(p)++;
+        }
+        COORDX(p)++;
+    }
+
+    COORDX(p) = xmin;
+    COORDY(p) = ymin;
+    for (i = 0; i < distAbs; i++)
+    {
+        for (j = 0; j < distOrd ; j++)
+        {
+            image_move_to(pic, &p);
+            image_read_pixel(pic, COORDX(p), COORDY(p), tab);
+            if (dim == 3)
+            {
+                ordre1[0] = ordre1[0] + tab[0]*tab[0];
+                ordre1[1] = ordre1[1] + tab[1]*tab[1];
+                ordre1[2] = ordre1[2] + tab[2]*tab[2];
+            }
+
+            else
+            {
+                ordre1[0] = ordre1[0] + tab[0]*tab[0];
+            }
+            COORDY(p)++;
+        }
+        COORDX(p)++;
+    }
+}
+
+

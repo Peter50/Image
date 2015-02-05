@@ -1,0 +1,17 @@
+CC=gcc
+LDFLAGS= -g -lm
+CFLAGS=-Wextra -g -Wall -pedantic -ansi -std=c99 -I inc
+
+all: file
+
+obj/file.o: src/file.c inc/file.h
+obj/main.o: src/main.c
+
+obj/%.o: src/%.c
+	$(CC) -c $< -o $@ $(CFLAGS)
+file: obj/main.o obj/file.o
+	$(CC) $^ -o $@ $(LDFLAGS)
+clean:
+	-rm obj/*o
+distclean:
+	-rm file
